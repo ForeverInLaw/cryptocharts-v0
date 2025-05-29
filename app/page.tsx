@@ -175,10 +175,18 @@ function CryptoCard({ crypto }: { crypto: CryptoData }) {
 
 export default function CryptoDashboard() {
   const [cryptoData, setCryptoData] = useState<CryptoData[]>([])
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const [lastUpdateTimeString, setLastUpdateTimeString] = useState<string>("")
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    // Initialize chart data
+
+    setIsClient(true)
+
+    const updateAndSetTime = () => {
+      setLastUpdateTimeString(new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }))
+    }
+    updateAndSetTime() // Set initial time on client mount
+
     const initialData = initialCryptoData.map((crypto) => ({
       ...crypto,
       chartData: generateInitialChartData(crypto.price),
@@ -209,7 +217,7 @@ export default function CryptoDashboard() {
           }
         }),
       )
-      setLastUpdate(new Date())
+      updateAndSetTime()
     }, 5000)
 
     return () => clearInterval(interval)
@@ -232,7 +240,7 @@ export default function CryptoDashboard() {
           </p>
           <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 text-sm text-muted-foreground">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            Last updated: {lastUpdate.toLocaleTimeString()}
+            Last updated: {isClient ? lastUpdateTimeString : "Loading..."}
           </div>
         </header>
 
